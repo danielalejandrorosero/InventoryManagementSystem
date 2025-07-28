@@ -1,0 +1,577 @@
+swagger: "2.0"
+info:
+  title: API de INVSYS
+  description: Documentación de la API de INVSYS
+  version: "1.0"
+host: localhost:5000
+basePath: /
+schemes:
+  - http
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Autenticación
+      summary: Iniciar sesión de usuario
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/Login'
+      responses:
+        200:
+          description: Autenticación exitosa
+        400:
+          description: Faltan credenciales
+        401:
+          description: Credenciales inválidas
+
+  /auth/logout:
+    post:
+      tags:
+        - Autenticación
+      summary: Cerrar sesión (revocar token JWT)
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: Token revocado correctamente
+
+  /auth/recuperar:
+    post:
+      tags:
+        - Autenticación
+      summary: Solicitar recuperación de contraseña
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/Recuperar'
+      responses:
+        200:
+          description: Correo enviado con token
+        400:
+          description: Correo no encontrado
+
+  /auth/restablecer:
+    post:
+      tags:
+        - Autenticación
+      summary: Restablecer contraseña
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/Restablecer'
+      responses:
+        200:
+          description: Contraseña restablecida
+        400:
+          description: Token inválido o expirado
+
+  /usuarios/registro:
+    post:
+      tags:
+        - Usuarios
+      summary: Registrar nuevo usuario (requiere autenticación)
+      security:
+        - Bearer: []
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            required:
+              - nombre
+              - nombreUsuario
+              - email
+              - password
+              - nivel_usuario
+            properties:
+              nombre:
+                type: string
+              nombreUsuario:
+                type: string
+              email:
+                type: string
+              password:
+                type: string
+              nivel_usuario:
+                type: integer
+      responses:
+        201:
+          description: Usuario registrado correctamente
+        400:
+          description: Datos inválidos o usuario ya existe
+        500:
+          description: Error interno del servidor
+
+  /usuarios/listar_usuarios:
+    get:
+      tags:
+        - Usuarios
+      summary: Listar todos los usuarios
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: Lista de usuarios
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Usuario'
+        404:
+          description: No hay usuarios registrados
+        500:
+          description: Error al serializar los datos
+
+  /usuarios/{id}:
+    put:
+      tags:
+        - Usuarios
+      summary: Editar usuario por ID
+      security:
+        - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+          description: ID del usuario a editar
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/EditarUsuario'
+      responses:
+        200:
+          description: Usuario editado correctamente
+        400:
+          description: Datos inválidos
+        404:
+          description: Usuario no encontrado
+        500:
+          description: Error interno del servidor
+
+  /imagenes_usuarios/subir_imagen_usuario:
+    post:
+      tags:
+        - Imágenes Usuarios
+      summary: Subir imagen de usuario
+      security:
+        - Bearer: []
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: imagen
+          type: file
+          required: true
+          description: Archivo de imagen a subir (png, jpg, jpeg)
+      responses:
+        201:
+          description: Imagen subida correctamente
+          schema:
+            type: object
+            properties:
+              msg:
+                type: string
+              filename:
+                type: string
+              ruta:
+                type: string
+        400:
+          description: Error en la subida de imagen
+        500:
+          description: Error al guardar en la base de datos
+
+  /imagenes_productos/subir_imagen_producto:
+    post:
+      tags:
+        - Imágenes Productos
+      summary: Subir imagen de producto
+      security:
+        - Bearer: []
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: imagen
+          type: file
+          required: true
+          description: Archivo de imagen a subir (png, jpg, jpeg)
+        - in: formData
+          name: id_producto
+          type: integer
+      responses:
+        201:
+          description: Imagen subida correctamente
+          schema:
+            type: object
+            properties:
+              msg:
+                type: string
+              filename:
+                type: string
+              ruta:
+                type: string
+        400:
+          description: Error en la subida de imagen
+        500:
+          description: Error al guardar en la base de datos
+
+  /productos/crearProducto:
+    post:
+      tags:
+        - Productos
+      summary: Crear un nuevo producto
+      security:
+        - Bearer: []
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/Producto'
+      responses:
+        201:
+          description: Producto creado correctamente
+        400:
+          description: Datos inválidos o producto ya existe
+        500:
+          description: Error interno del servidor
+
+  /productos/listarProductos:
+    post:
+      tags:
+        - Productos
+      summary: Listar todos los productos
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: Lista de productos
+          schema:
+            type: array
+            items:
+  /productos/{id}:
+    put:
+      tags:
+        - Productos
+      summary: Editar un producto existente
+      security:
+        - Bearer: []
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+          description: ID del producto a editar
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/Producto'
+      responses:
+        200:
+          description: Producto actualizado correctamente
+        400:
+          description: Datos inválidos
+        404:
+          description: Producto no encontrado
+        500:
+          description: Error interno del servidor
+    delete:
+      tags:
+        - Productos
+      summary: Eliminar (soft delete) un producto existente
+      security:
+        - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+          description: ID del producto a eliminar
+      responses:
+        200:
+          description: Producto eliminado correctamente (soft delete)
+        404:
+          description: Producto no encontrado
+        500:
+          description: Error interno del servidor
+  /productos/restaurar/{id}:
+    put:
+      tags:
+        - Productos
+      summary: Restaurar un producto eliminado (soft delete)
+      security:
+        - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+          description: ID del producto a restaurar
+      responses:
+        200:
+          description: Producto restaurado correctamente
+        400:
+          description: El producto no está marcado como eliminado
+        404:
+          description: Producto no encontrado
+        500:
+          description: Error interno del servidor
+  /productos/listar_eliminados:
+    post:
+      tags:
+        - Productos
+      summary: Listar todos los productos eliminados (soft delete)
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: Lista de productos eliminados
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Producto'
+        404:
+          description: No se encontraron productos eliminados
+        500:
+          description: Error interno del servidor
+  /productos/buscarProductos:
+    post:
+      tags:
+        - Productos
+      summary: Buscar productos activos por texto (nombre, código, sku, descripción)
+      security:
+        - Bearer: []
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/BuscarProductoBusquedaInput'
+      responses:
+        200:
+          description: Lista de productos encontrados
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/BuscarProducto'
+        400:
+          description: Datos inválidos
+        404:
+          description: No se encontraron productos
+        500:
+          description: Error interno del servidor
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+    description: >
+      JWT Token. Usa el formato:
+      `Bearer tu_token`
+
+definitions:
+  Login:
+    type: object
+    required:
+      - nombreUsuario
+      - password
+    properties:
+      nombreUsuario:
+        type: string
+        minLength: 8
+      password:
+        type: string
+  Recuperar:
+    type: object
+    required:
+      - email
+    properties:
+      email:
+        type: string
+        format: email
+  Restablecer:
+    type: object
+    required:
+      - token
+      - nueva_password
+    properties:
+      token:
+        type: string
+      nueva_password:
+        type: string
+        minLength: 6
+  Usuario:
+    type: object
+    properties:
+      id_usuario:
+        type: integer
+      nombre:
+        type: string
+      nombreUsuario:
+        type: string
+      email:
+        type: string
+      nivel_usuario:
+        type: integer
+  EditarUsuario:
+    type: object
+    properties:
+      nombre:
+        type: string
+      nombreUsuario:
+        type: string
+      email:
+        type: string
+  Producto:
+    type: object
+    properties:
+      id_producto:
+        type: integer
+      nombre_producto:
+        type: string
+      codigo:
+        type: string
+      sku:
+        type: string
+      descripcion:
+        type: string
+      precio_compra:
+        type: number
+        format: float
+      precio_venta:
+        type: number
+        format: float
+      id_unidad_medida:
+        type: integer
+      stock_minimo:
+        type: number
+        format: float
+      stock_maximo:
+        type: number
+        format: float
+      id_categoria:
+        type: integer
+      fecha_creacion:
+        type: string
+        format: date-time
+      fecha_actualizacion:
+        type: string
+        format: date-time
+      id_proveedor:
+        type: integer
+      estado:
+        type: string
+        enum: [activo, eliminado]
+  BuscarProducto:
+    type: object
+    properties:
+      id_producto:
+        type: integer
+      nombre_producto:
+        type: string
+      codigo:
+        type: string
+      sku:
+        type: string
+      descripcion:
+        type: string
+      precio_compra:
+        type: number
+        format: float
+      precio_venta:
+        type: number
+        format: float
+      id_unidad_medida:
+        type: integer
+      stock_minimo:
+        type: number
+        format: float
+      stock_maximo:
+        type: number
+        format: float
+      id_categoria:
+        type: integer
+      fecha_creacion:
+        type: string
+        format: date-time
+      fecha_actualizacion:
+        type: string
+        format: date-time
+      id_proveedor:
+        type: integer
+      estado:
+        type: string
+        enum: [activo, eliminado]
+  BuscarProductoInput:
+    type: object
+    properties:
+      id_producto:
+        type: integer
+      nombre_producto:
+        type: string
+      codigo:
+        type: string
+      sku:
+        type: string
+      descripcion:
+        type: string
+      precio_compra:
+        type: number
+        format: float
+      precio_venta:
+        type: number
+        format: float
+      id_unidad_medida:
+        type: integer
+      stock_minimo:
+        type: number
+        format: float
+      stock_maximo:
+        type: number
+        format: float
+      id_categoria:
+        type: integer
+      fecha_creacion:
+        type: string
+        format: date-time
+      fecha_actualizacion:
+        type: string
+        format: date-time
+      id_proveedor:
+        type: integer
+      estado:
+        type: string
+        enum: [activo, eliminado]
+  BuscarProductoBusquedaInput:
+    type: object
+    required:
+      - busqueda
+    properties:
+      busqueda:
+        type: string
+        description: Texto a buscar (nombre, código, sku, descripción)
