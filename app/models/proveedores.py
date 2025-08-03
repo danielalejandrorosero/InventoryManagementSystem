@@ -9,7 +9,7 @@ class Proveedor(db.Model):
     contacto = db.Column(db.String(255), nullable=False)
     telefono = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), nullable=False)
-    direccion = db.Column(db.String(255), nullable=True)
+    direccion = db.Column(db.String(255), nullable=False)  # Cambiado a obligatorio
     estado = db.Column(db.Enum('activo', 'eliminado'), nullable=False, default='activo')
 
     # Relaciones

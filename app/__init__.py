@@ -17,7 +17,12 @@ from app.routes.auth import auth_bp, blacklist
 from app.routes.usuarios_routes import usuarios_bp
 from app.routes.imagenes_usuarios_routes import imagenes_usuarios_bp
 from app.routes.imagenes_productos_routes import imagenes_productos_bp
+from app.routes.categorias_routes import categorias_bp
 from app.routes.productos_routes import productos_bp
+
+from app.routes.proveedores_routes import proveedores_bp
+
+
 from flasgger import Swagger
 jwt = JWTManager()  # Inicializamos el JWTManager globalmente
 
@@ -53,6 +58,10 @@ def create_app(config_name=None):
     app.register_blueprint(imagenes_usuarios_bp, url_prefix='/imagenes_usuarios')
     app.register_blueprint(imagenes_productos_bp, url_prefix='/imagenes_productos')
     app.register_blueprint(productos_bp, url_prefix='/productos')
+    app.register_blueprint(categorias_bp, url_prefix='/categorias')
+    app.register_blueprint(proveedores_bp, url_prefix='/proveedores')
+
+
 
 
 

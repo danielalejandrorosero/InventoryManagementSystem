@@ -120,7 +120,7 @@ paths:
           description: Error interno del servidor
 
   /usuarios/listar_usuarios:
-    get:
+    post:
       tags:
         - Usuarios
       summary: Listar todos los usuarios
@@ -269,6 +269,11 @@ paths:
           schema:
             type: array
             items:
+              $ref: '#/definitions/Producto'
+        404:
+          description: No se encontraron productos
+        500:
+          description: Error interno del servidor
   /productos/{id}:
     put:
       tags:
@@ -385,6 +390,183 @@ paths:
           description: No se encontraron productos
         500:
           description: Error interno del servidor
+  /categorias/crearCategoria:
+    post:
+      tags:
+        - Categorias
+      summary: Crear una nueva categoría
+      security:
+        - Bearer: []
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/CategoriaInput'
+      responses:
+        201:
+          description: Categoría creada correctamente
+        400:
+          description: Datos inválidos o categoría ya existe
+        500:
+          description: Error interno del servidor
+  /categorias/{id}:
+    put:
+      tags:
+        - Categorias
+      summary: Editar una categoría existente
+      security:
+        - Bearer: []
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+          description: ID de la categoría a editar
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/CategoriaInput'
+      responses:
+        200:
+          description: Categoría editada correctamente
+        400:
+          description: Datos inválidos
+        404:
+          description: Categoría no encontrada
+        500:
+          description: Error interno del servidor
+    delete:
+      tags:
+        - Categorias
+      summary: Eliminar (soft delete) una categoría existente
+      security:
+        - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+          description: ID de la categoría a eliminar
+      responses:
+        200:
+          description: Categoría eliminada correctamente (soft delete)
+        404:
+          description: Categoría no encontrada
+        500:
+          description: Error interno del servidor
+  /categorias/listarCategorias:
+    post:
+      tags:
+        - Categorias
+      summary: Listar todas las categorías activas
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: Lista de categorías activas
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CategoriaInput'
+        404:
+          description: No hay categorías activas
+        500:
+          description: Error interno del servidor
+  /proveedores/crearProveedor:
+    post:
+      tags:
+        - Proveedores
+      summary: Crear un nuevo proveedor
+      security:
+        - Bearer: []
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ProveedorInput'
+      responses:
+        201:
+          description: Proveedor creado correctamente
+        400:
+          description: Datos inválidos o proveedor ya existe
+        500:
+          description: Error interno del servidor
+  /proveedores/{id}:
+    put:
+      tags:
+        - Proveedores
+      summary: Editar un proveedor existente
+      security:
+        - Bearer: []
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+          description: ID del proveedor a editar
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ProveedorInput'
+      responses:
+        200:
+          description: Proveedor editado correctamente
+        400:
+          description: Datos inválidos
+        404:
+          description: Proveedor no encontrado
+        500:
+          description: Error interno del servidor
+    delete:
+      tags:
+        - Proveedores
+      summary: Eliminar (soft delete) un proveedor existente
+      security:
+        - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+          description: ID del proveedor a eliminar
+      responses:
+        200:
+          description: Proveedor eliminado correctamente (soft delete)
+        404:
+          description: Proveedor no encontrado
+        500:
+          description: Error interno del servidor
+  /proveedores/listarProveedores:
+    post:
+      tags:
+        - Proveedores
+      summary: Listar todos los proveedores activos
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: Lista de proveedores activos
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ProveedorInput'
+        404:
+          description: No se encontraron proveedores
+        500:
+          description: Error interno del servidor
+
 securityDefinitions:
   Bearer:
     type: apiKey
@@ -450,8 +632,6 @@ definitions:
   Producto:
     type: object
     properties:
-      id_producto:
-        type: integer
       nombre_producto:
         type: string
       codigo:
@@ -476,17 +656,8 @@ definitions:
         format: float
       id_categoria:
         type: integer
-      fecha_creacion:
-        type: string
-        format: date-time
-      fecha_actualizacion:
-        type: string
-        format: date-time
       id_proveedor:
         type: integer
-      estado:
-        type: string
-        enum: [activo, eliminado]
   BuscarProducto:
     type: object
     properties:
@@ -530,15 +701,11 @@ definitions:
   BuscarProductoInput:
     type: object
     properties:
-      id_producto:
-        type: integer
-      nombre_producto:
-        type: string
       codigo:
         type: string
-      sku:
-        type: string
       descripcion:
+        type: string
+      nombre_producto:
         type: string
       precio_compra:
         type: number
@@ -546,27 +713,15 @@ definitions:
       precio_venta:
         type: number
         format: float
-      id_unidad_medida:
-        type: integer
-      stock_minimo:
-        type: number
-        format: float
+      sku:
+        type: string
       stock_maximo:
         type: number
         format: float
-      id_categoria:
-        type: integer
-      fecha_creacion:
-        type: string
-        format: date-time
-      fecha_actualizacion:
-        type: string
-        format: date-time
-      id_proveedor:
-        type: integer
-      estado:
-        type: string
-        enum: [activo, eliminado]
+      stock_minimo:
+        type: number
+        format: float
+      # Se eliminan estado, fecha_actualizacion, fecha_creacion, id_categoria, id_producto, id_proveedor, id_unidad_medida
   BuscarProductoBusquedaInput:
     type: object
     required:
@@ -575,3 +730,35 @@ definitions:
       busqueda:
         type: string
         description: Texto a buscar (nombre, código, sku, descripción)
+  CategoriaInput:
+    type: object
+    required:
+      - nombre_categoria
+      - estado
+    properties:
+      nombre_categoria:
+        type: string
+      descripcion_categoria:
+        type: string
+      estado:
+        type: string
+        enum: [activo, eliminado]
+  ProveedorInput:
+    type: object
+    required:
+      - nombre_proveedor
+      - contacto
+      - telefono
+      - email
+      - direccion
+    properties:
+      nombre_proveedor:
+        type: string
+      contacto:
+        type: string
+      telefono:
+        type: string
+      email:
+        type: string
+      direccion:
+        type: string
